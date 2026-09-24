@@ -1,0 +1,256 @@
+import { TranslatedText as T } from "@/components/language-provider";
+import { AccountActions } from "@/components/account-actions";
+import { DatabaseSetup } from "@/components/database-setup";
+import Link from "next/link";
+
+import {
+  Award,
+  BarChart3,
+  BadgeCheck,
+  Building2,
+  FileText,
+  GraduationCap,
+  Lock,
+  Mail,
+  MapPin,
+  Medal,
+  Target,
+  UserRound,
+  Zap,
+} from "lucide-react";
+import { getActiveUser } from "@/lib/session";
+import { getUserStats } from "@/lib/queries";
+import { allBadges } from "@/lib/badges";
+import { Breadcrumbs, StatCard } from "@/components/ui";
+
+export const dynamic = "force-dynamic";
+
+export default async function Account() {
+  const user = await getActiveUser();
+  if (!user) return <DatabaseSetup />;
+
+  const stats = await getUserStats(user.id, user.className);
+  const badges = allBadges(
+    await (async () => {
+      const { getBadgesForUser } = await import("@/lib/queries");
+      return getBadgesForUser(user.id);
+    })(),
+  );
+
+  const rows: [string, React.ReactNode][] = [
+    ["Handle", `@${user.handle}`],
+    [
+      "Role",
+      user.isGuest ? (
+        <T values={{ role: user.role }}>{"Guest {role}"}</T>
+      ) : user.role === "faculty" ? (
+        <T>Faculty / Teacher</T>
+      ) : (
+        <T>Student</T>
+      ),
+    ],
+    [
+      user.role === "faculty" ? "Specialization" : "Class",
+      user.role === "faculty"
+        ? user.subjectSpecialization
+        : user.className
+          ? <T values={{ classNo: user.className }}>{"Class {classNo}"}</T>
+          : null,
+    ],
+    ["State / UT", user.state],
+    [
+      user.role === "faculty" ? "Institution ID" : "School",
+      user.role === "faculty" ? user.institutionId : user.school,
+    ],
+    ["Email", user.email],
+  ];
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <Breadcrumbs
+        items={[
+          { href: "/home", label: <T>Home</T> },
+          { label: "My Account" },
+        ]}
+      />
+      <div className="card-hover vsv-enter flex flex-wrap items-center gap-4 rounded-xl border border-line bg-white p-5 shadow-sm">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-navy-800 text-2xl font-extrabold text-white">
+          {user.name.charAt(0)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-extrabold text-navy-900">{user.name}</h1>
+          <p className="text-[14px] font-semibold text-slate-500">
+            @{user.handle} ·{" "}
+            {user.role === "faculty"
+              ? "Faculty"
+              : `Class ${user.className ?? "—"}`}
+          </p>
+          {user.isGuest && (
+            <span className="mt-1 inline-block rounded-sm bg-saffron-100 px-2 py-0.5 text-[12px] font-bold text-saffron-700">
+              <T>
+                Shared demo guest — sign in for your own notes, votes, and
+                scores
+              </T>
+            </span>
+          )}
+        </div>
+        <BadgeCheck
+          className="h-8 w-8 text-leaf-500"
+          aria-label="Verified portal account"
+        />
+      </div>
+
+      <AccountActions />
+
+      <div className="vsv-enter mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard icon={Zap} label="Total XP" value={stats.xp} tone="saffron" />
+        <StatCard
+          icon={Medal}
+          label="Class Rank"
+          value={stats.rank ? `#${stats.rank}` : "—"}
+        />
+        <StatCard
+          icon={Target}
+          label="Accuracy"
+          value={stats.accuracy !== null ? `${stats.accuracy}%` : "—"}
+          sub={
+            <T values={{ count: stats.objectiveAttempts }}>
+              {"{count} objective tests"}
+            </T>
+          }
+        />
+        <StatCard icon={Award} label="Notes Shared" value={stats.notes} />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Link
+          href="/analytics"
+          className="inline-flex items-center gap-2 rounded-lg border border-navy-200 bg-navy-50 px-4 py-2 text-sm font-bold text-navy-800 transition hover:border-navy-400"
+        >
+          <BarChart3 className="h-4 w-4" aria-hidden="true" />
+          <T>Open Learning Analytics — streaks, skills and trends</T>
+        </Link>
+        <Link
+          href="/report"
+          className="inline-flex items-center gap-2 rounded-lg border border-navy-200 bg-navy-50 px-4 py-2 text-sm font-bold text-navy-800 transition hover:border-navy-400"
+        >
+          <FileText className="h-4 w-4" aria-hidden="true" />
+          <T>Printable Progress Report</T>
+        </Link>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <section className="vsv-enter rounded-lg border border-line bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-extrabold text-navy-900">
+            <T>Profile</T>
+          </h2>
+          <dl className="mt-3 divide-y divide-line">
+            {rows.map(([k, v]) => (
+              <div
+                key={k}
+                className="flex items-center gap-3 py-2.5 text-[15px]"
+              >
+                <dt className="flex w-40 shrink-0 items-center gap-2 font-bold text-slate-500">
+                  {k === "Email" ? (
+                    <Mail className="h-4 w-4" />
+                  ) : k === "State / UT" ? (
+                    <MapPin className="h-4 w-4" />
+                  ) : k === "Handle" ? (
+                    <UserRound className="h-4 w-4" />
+                  ) : k === "Role" ? (
+                    <GraduationCap className="h-4 w-4" />
+                  ) : (
+                    <Building2 className="h-4 w-4" />
+                  )}
+                  <T>{k}</T>
+                </dt>
+                <dd className="min-w-0 truncate font-semibold text-navy-900">
+                  {v ?? "—"}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section
+          className="vsv-enter rounded-lg border border-line bg-white p-5 shadow-sm"
+          style={{ animationDelay: "60ms" }}
+        >
+          <h2 className="text-lg font-extrabold text-navy-900">
+            <T>Badges</T>
+          </h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {badges.map((b) => (
+              <li
+                key={b.id}
+                className={`flex items-start gap-2.5 rounded-md border p-3 ${
+                  b.earned
+                    ? "border-saffron-200 bg-saffron-50"
+                    : "border-line bg-paper opacity-70"
+                }`}
+              >
+                <span
+                  className={`rounded-full p-1.5 ${b.earned ? "bg-saffron-500 text-navy-950" : "bg-slate-200 text-slate-500"}`}
+                >
+                  {b.earned ? (
+                    <Award className="h-4 w-4" />
+                  ) : (
+                    <Lock className="h-4 w-4" />
+                  )}
+                </span>
+                <div>
+                  <p className="text-[14px] font-extrabold text-navy-900">
+                    {b.name}
+                  </p>
+                  <p className="text-[12px] leading-snug text-slate-600">
+                    {b.desc}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <section className="vsv-enter mt-6 rounded-lg border border-line bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-extrabold text-navy-900">
+          <T>XP activity</T>
+        </h2>
+        {stats.recent.length === 0 ? (
+          <p className="mt-2 text-sm text-slate-600">
+            <T>
+              No activity yet — complete an objective test to earn your first
+              +XP!
+            </T>
+          </p>
+        ) : (
+          <ul className="mt-3 divide-y divide-line">
+            {stats.recent.map((e) => (
+              <li key={e.id} className="flex items-center gap-3 py-2.5">
+                <span className="rounded-md bg-saffron-50 px-2.5 py-1 text-[14px] font-extrabold text-saffron-700">
+                  +{e.amount}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[14px] font-bold text-navy-800">
+                    {e.note}
+                  </p>
+                  <p className="text-[12px] text-slate-500">
+                    {new Date(e.createdAt).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <span className="ml-auto rounded-sm bg-navy-50 px-2 py-0.5 text-[11px] font-bold uppercase text-navy-500">
+                  {e.type}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}

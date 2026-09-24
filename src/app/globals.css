@@ -1,0 +1,615 @@
+@import "tailwindcss";
+/* KaTeX typesets AI answers containing fractions, exponents and other LaTeX. */
+@import "katex/dist/katex.min.css";
+@import "@fontsource/mukta/400.css";
+@import "@fontsource/mukta/500.css";
+@import "@fontsource/mukta/600.css";
+@import "@fontsource/mukta/700.css";
+@import "@fontsource/mukta/800.css";
+@import "@fontsource/noto-serif-devanagari/500.css";
+@import "@fontsource/noto-serif-devanagari/600.css";
+@import "@fontsource/noto-serif-devanagari/700.css";
+
+
+@import "@fontsource/noto-sans-telugu/400.css";
+@import "@fontsource/noto-sans-telugu/700.css";
+@import "@fontsource/noto-sans-tamil/400.css";
+@import "@fontsource/noto-sans-tamil/700.css";
+@import "@fontsource/noto-sans-kannada/400.css";
+@import "@fontsource/noto-sans-kannada/700.css";
+@import "@fontsource/noto-sans-malayalam/400.css";
+@import "@fontsource/noto-sans-malayalam/700.css";
+
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-mukta: "Mukta";
+  --font-deva: "Noto Serif Devanagari";
+  --font-sans: var(--font-mukta), "Mukta", "Noto Sans Telugu", "Noto Sans Tamil", "Noto Sans Kannada", "Noto Sans Malayalam", "Segoe UI", sans-serif;
+  --font-display: var(--font-deva), "Noto Serif Devanagari", "Mukta", serif;
+
+  --color-navy-50: #eef4f9;
+  --color-navy-100: #dce8f2;
+  --color-navy-200: #b9cfe3;
+  --color-navy-300: #86add1;
+  --color-navy-400: #4d84b4;
+  --color-navy-500: #2c679c;
+  --color-navy-600: #1d5080;
+  --color-navy-700: #17436b;
+  --color-navy-800: #133b5c;
+  --color-navy-900: #0c2a43;
+  --color-navy-950: #081f33;
+
+  --color-saffron-50: #fff6ea;
+  --color-saffron-100: #ffe9cb;
+  --color-saffron-200: #ffd9a8;
+  --color-saffron-300: #ffc071;
+  --color-saffron-400: #ffaa4b;
+  --color-saffron-500: #ff9933;
+  --color-saffron-600: #e07b0f;
+  --color-saffron-700: #b95f07;
+
+  --color-leaf-50: #e8f5e6;
+  --color-leaf-100: #d0ebcc;
+  --color-leaf-500: #2f9e44;
+  --color-leaf-600: #26843a;
+  --color-leaf-700: #1e6b30;
+
+  --color-paper: #f3f6f9;
+  --color-line: #d9e2ea;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: #14212e;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-saffron-200);
+  color: var(--color-navy-900);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-saffron-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tricolor-strip {
+  background: linear-gradient(
+    to right,
+    #ff9933 0 33.4%,
+    #ffffff 33.4% 66.7%,
+    #138808 66.7% 100%
+  );
+}
+
+/* subtle institutional grid for hero */
+.gov-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@keyframes vs-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.vsv-enter {
+  animation: vs-rise 0.35s ease both;
+}
+
+@keyframes vs-pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.vs-pulse {
+  animation: vs-pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* Data-saver mode: strip decoration, freeze motion */
+[data-saver="1"] .vsv-enter,
+[data-saver="1"] .vs-pulse,
+[data-saver="1"] .gov-grid {
+  animation: none;
+  background-image: none;
+}
+[data-saver="1"] {
+  scroll-behavior: auto;
+}
+
+/* thin scrollbars for note previews */
+.note-scroll::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.note-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-navy-200);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   Dark Mode Support (Modern Obsidian & Deep Navy Theme)
+   ========================================================================== */
+html.dark, [data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #0b0f19;
+  --color-line: #1e293b;
+}
+
+html.dark body, [data-theme="dark"] body {
+  background-color: #0b0f19;
+  background-image: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.08) 0px, transparent 50%);
+  color: #f1f5f9;
+}
+
+html.dark .bg-white, [data-theme="dark"] .bg-white {
+  background-color: #111827;
+  border-color: #1f293d;
+}
+
+html.dark .bg-paper, [data-theme="dark"] .bg-paper {
+  background-color: #0f172a;
+}
+
+html.dark .border-line, [data-theme="dark"] .border-line {
+  border-color: #1e293b;
+}
+
+html.dark .text-navy-950, html.dark .text-navy-900, html.dark .text-navy-800,
+[data-theme="dark"] .text-navy-950, [data-theme="dark"] .text-navy-900, [data-theme="dark"] .text-navy-800 {
+  color: #f8fafc;
+}
+
+html.dark .text-navy-700, html.dark .text-navy-600,
+[data-theme="dark"] .text-navy-700, [data-theme="dark"] .text-navy-600 {
+  color: #93c5fd;
+}
+
+html.dark .text-slate-700, html.dark .text-slate-600, html.dark .text-slate-500,
+[data-theme="dark"] .text-slate-700, [data-theme="dark"] .text-slate-600, [data-theme="dark"] .text-slate-500 {
+  color: #94a3b8;
+}
+
+html.dark .bg-navy-50, html.dark .bg-navy-50\/50, html.dark .bg-navy-50\/60, html.dark .bg-navy-50\/70,
+[data-theme="dark"] .bg-navy-50, [data-theme="dark"] .bg-navy-50\/50, [data-theme="dark"] .bg-navy-50\/60, [data-theme="dark"] .bg-navy-50\/70 {
+  background-color: #162032;
+  border-color: #24324a;
+}
+
+html.dark .border-navy-200, html.dark .border-navy-300,
+[data-theme="dark"] .border-navy-200, [data-theme="dark"] .border-navy-300 {
+  border-color: #24344d;
+}
+
+html.dark .bg-saffron-50, html.dark .bg-saffron-50\/50, html.dark .bg-saffron-50\/60, html.dark .bg-saffron-50\/70, html.dark .bg-saffron-50\/80,
+[data-theme="dark"] .bg-saffron-50, [data-theme="dark"] .bg-saffron-50\/50, [data-theme="dark"] .bg-saffron-50\/60, [data-theme="dark"] .bg-saffron-50\/70, [data-theme="dark"] .bg-saffron-50\/80 {
+  background-color: rgba(245, 158, 11, 0.12);
+}
+
+html.dark .border-saffron-200, html.dark .border-saffron-300,
+[data-theme="dark"] .border-saffron-200, [data-theme="dark"] .border-saffron-300 {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+html.dark .text-saffron-700, html.dark .text-saffron-600,
+[data-theme="dark"] .text-saffron-700, [data-theme="dark"] .text-saffron-600 {
+  color: #fbbf24;
+}
+
+html.dark .bg-leaf-50, html.dark .bg-leaf-50\/60,
+[data-theme="dark"] .bg-leaf-50, [data-theme="dark"] .bg-leaf-50\/60 {
+  background-color: rgba(34, 197, 94, 0.14);
+}
+
+html.dark .border-leaf-100, html.dark .border-leaf-500\/40, html.dark .border-leaf-500\/50, html.dark .border-leaf-500\/60,
+[data-theme="dark"] .border-leaf-100, [data-theme="dark"] .border-leaf-500\/40, [data-theme="dark"] .border-leaf-500\/50, [data-theme="dark"] .border-leaf-500\/60 {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+html.dark .text-leaf-700, html.dark .text-leaf-600,
+[data-theme="dark"] .text-leaf-700, [data-theme="dark"] .text-leaf-600 {
+  color: #4ade80;
+}
+
+html.dark header, [data-theme="dark"] header {
+  background-color: rgba(11, 15, 25, 0.9) !important;
+  border-bottom-color: rgba(245, 158, 11, 0.7) !important;
+  backdrop-filter: blur(12px);
+}
+
+html.dark footer, [data-theme="dark"] footer {
+  background-color: #070a12 !important;
+  border-top: 1px solid #1e293b;
+}
+
+html.dark input, html.dark select, html.dark textarea,
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+html.dark input:focus, html.dark select:focus, html.dark textarea:focus,
+[data-theme="dark"] input:focus, [data-theme="dark"] select:focus, [data-theme="dark"] textarea:focus {
+  background-color: #131d33;
+  border-color: var(--color-saffron-500);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+html.dark .note-scroll::-webkit-scrollbar-thumb,
+[data-theme="dark"] .note-scroll::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* Keep orange action text readable in both themes. */
+[data-theme="dark"] .bg-saffron-500.text-navy-950 {
+  color: #081f33;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .vsv-enter, .vs-pulse { animation: none; }
+}
+
+/* ==========================================================================
+   Learning analytics — activity heatmap tiers.
+   Five discrete intensity tiers driven purely by CSS variables so the grid
+   restyles instantly across light, dark and high-contrast themes without a
+   re-render. Tier 0 is the muted "inactive" cell; tier 4 the deep-emerald
+   "ultra-active" cell.
+   ========================================================================== */
+:root {
+  --heat-0: #e6edf3;
+  --heat-1: #c8e6cf;
+  --heat-2: #93d5a3;
+  --heat-3: #4fae6a;
+  --heat-4: #1e6b30;
+  --heat-ring: #14212e;
+}
+html.dark, [data-theme="dark"] {
+  --heat-0: #17202e;
+  --heat-1: #14401f;
+  --heat-2: #1d6b34;
+  --heat-3: #2c9c4b;
+  --heat-4: #4ade80;
+  --heat-ring: #f1f5f9;
+}
+
+/* Crisp 1px-gap grid; hover focus ring uses the theme-aware outline colour. */
+.heat-cell {
+  shape-rendering: crispEdges;
+  rx: 2;
+}
+.heat-cell-hover {
+  stroke: var(--heat-ring);
+  stroke-width: 1;
+  outline: none;
+}
+
+/* Data-saver mode and reduced-motion: no transitions or hover fades. */
+.heat-cell, .heat-tip {
+  transition: opacity 0.15s ease;
+}
+[data-saver="1"] .heat-cell, [data-saver="1"] .heat-tip {
+  transition: none;
+}
+/* Data Saver also freezes loading skeletons. */
+[data-saver="1"] .animate-pulse { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .heat-cell, .heat-tip { transition: none; }
+}
+
+/* Indic compound words must wrap inside narrow cards/buttons on mobile. */
+html:not([lang="en"]) body { overflow-wrap: anywhere; }
+
+/* ==========================================================================
+   GIGW accessibility toolbar — text size steps (A- / A / A+).
+   Scales the rem base so all relative sizing grows; GOI portals are expected
+   to offer at least three text-size steps.
+   ========================================================================== */
+html[data-fontscale="1"] { font-size: 112.5%; }
+html[data-fontscale="2"] { font-size: 125%; }
+html[data-fontscale="1"] .tricolor-strip,
+html[data-fontscale="2"] .tricolor-strip { height: 4px; }
+
+/* ==========================================================================
+   GIGW high-contrast mode — forced light surface, pure black text, solid
+   borders and always-underlined links. Declared after the dark-mode block so
+   `[data-contrast="high"]` overrides it regardless of theme state.
+   ========================================================================== */
+[data-contrast="high"] {
+  --color-paper: #ffffff;
+  --color-line: #000000;
+  --heat-0: #ffffff;
+  --heat-1: #d9d9d9;
+  --heat-2: #a6a6a6;
+  --heat-3: #595959;
+  --heat-4: #000000;
+  --heat-ring: #000000;
+}
+[data-contrast="high"] body {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+}
+[data-contrast="high"] header,
+[data-contrast="high"] footer,
+[data-contrast="high"] .bg-white,
+[data-contrast="high"] .bg-paper,
+[data-contrast="high"] .bg-navy-50,
+[data-contrast="high"] .bg-navy-50\/50,
+[data-contrast="high"] .bg-navy-50\/60,
+[data-contrast="high"] .bg-navy-50\/70,
+[data-contrast="high"] .bg-saffron-50,
+[data-contrast="high"] .bg-saffron-50\/50,
+[data-contrast="high"] .bg-saffron-50\/60,
+[data-contrast="high"] .bg-saffron-50\/70,
+[data-contrast="high"] .bg-saffron-50\/80,
+[data-contrast="high"] .bg-leaf-50,
+[data-contrast="high"] .bg-leaf-50\/60 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+}
+[data-contrast="high"] a { text-decoration: underline; text-underline-offset: 2px; }
+[data-contrast="high"] a:hover { color: #0000cc !important; }
+[data-contrast="high"] .text-navy-950,
+[data-contrast="high"] .text-navy-900,
+[data-contrast="high"] .text-navy-800,
+[data-contrast="high"] .text-navy-700,
+[data-contrast="high"] .text-navy-600,
+[data-contrast="high"] .text-slate-700,
+[data-contrast="high"] .text-slate-600,
+[data-contrast="high"] .text-slate-500,
+[data-contrast="high"] .text-saffron-700,
+[data-contrast="high"] .text-saffron-600,
+[data-contrast="high"] .text-leaf-700,
+[data-contrast="high"] .text-leaf-600,
+[data-contrast="high"] .text-navy-950\/80 { color: #000000 !important; }
+[data-contrast="high"] .border-line,
+[data-contrast="high"] .border-navy-200,
+[data-contrast="high"] .border-navy-100,
+[data-contrast="high"] .border-saffron-200,
+[data-contrast="high"] .border-saffron-300,
+[data-contrast="high"] .border-leaf-100,
+[data-contrast="high"] .border-white\/15,
+[data-contrast="high"] .border-white\/20,
+[data-contrast="high"] .border-white\/25 { border-color: #000000 !important; }
+[data-contrast="high"] input,
+[data-contrast="high"] select,
+[data-contrast="high"] textarea {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+[data-contrast="high"] :focus-visible {
+  outline: 4px solid #b30000;
+  outline-offset: 2px;
+}
+[data-contrast="high"] .shadow-sm,
+[data-contrast="high"] .shadow,
+[data-contrast="high"] .shadow-md,
+[data-contrast="high"] .shadow-lg,
+[data-contrast="high"] .shadow-xl,
+[data-contrast="high"] .shadow-2xl { box-shadow: none !important; }
+/* Dark sections (hero/footer) stay dark for contrast, but with hard edges. */
+[data-contrast="high"] .bg-navy-900,
+[data-contrast="high"] .bg-navy-950,
+[data-contrast="high"] .bg-navy-950\/40,
+[data-contrast="high"] .bg-navy-800 {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+[data-contrast="high"] .bg-navy-900 .text-navy-100,
+[data-contrast="high"] .bg-navy-900 .text-navy-200,
+[data-contrast="high"] .bg-navy-900 .text-navy-300,
+[data-contrast="high"] .bg-navy-950 .text-navy-100,
+[data-contrast="high"] .bg-navy-950 .text-navy-200,
+[data-contrast="high"] .bg-navy-950 .text-navy-300,
+[data-contrast="high"] .bg-navy-800 .text-navy-100,
+[data-contrast="high"] .bg-navy-800 .text-navy-200,
+[data-contrast="high"] .bg-navy-950\/40 .text-navy-100,
+[data-contrast="high"] .bg-navy-950\/40 .text-navy-200 { color: #ffffff !important; }
+[data-contrast="high"] .bg-saffron-500 { background-color: #cc5c00 !important; color: #ffffff !important; }
+
+/* ==========================================================================
+   Shared component polish — cards, buttons, eyebrows, hero watermarks.
+   All effects are opt-out via data-saver and prefers-reduced-motion.
+   ========================================================================== */
+.card {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(12, 42, 67, 0.06);
+}
+.card-hover {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(12, 42, 67, 0.28);
+  border-color: var(--color-navy-300);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 10px;
+  background: var(--color-saffron-500);
+  padding: 0.7rem 1.25rem;
+  font-weight: 800;
+  color: #081f33;
+  box-shadow: 0 1px 2px rgba(12, 42, 67, 0.18);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-primary:hover { background: var(--color-saffron-400); box-shadow: 0 4px 14px -4px rgba(224, 123, 15, 0.5); }
+.btn-primary:active { transform: translateY(1px); }
+
+.btn-navy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 10px;
+  background: var(--color-navy-800);
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-navy:hover { background: var(--color-navy-700); }
+.btn-navy:active { transform: translateY(1px); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-navy-200);
+  background: #fff;
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  color: var(--color-navy-800);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.btn-outline:hover { border-color: var(--color-navy-400); background: var(--color-navy-50); }
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-saffron-700);
+}
+
+/* Oversized Ashoka Chakra watermark for hero panels. */
+.chakra-watermark {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Thin tricolor rule used under section headings. */
+.tricolor-rule {
+  height: 4px;
+  width: 64px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ff9933 0 40%, #138808 40% 100%);
+}
+
+/* Underline sweep for primary nav links. */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 2px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-saffron-500);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.18s ease;
+}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+.nav-link[aria-current="page"] { color: var(--color-navy-900); }
+
+/* Podium blocks on the leaderboard. */
+.podium-base {
+  background: linear-gradient(to top, var(--color-navy-50), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover, .btn-primary, .btn-navy, .btn-outline, .nav-link::after {
+    transition: none;
+  }
+  .card-hover:hover { transform: none; }
+}
+[data-saver="1"] .card-hover,
+[data-saver="1"] .btn-primary,
+[data-saver="1"] .btn-navy,
+[data-saver="1"] .btn-outline {
+  transition: none;
+  box-shadow: none;
+}
+[data-saver="1"] .card-hover:hover { transform: none; box-shadow: none; }
+[data-saver="1"] .nav-link::after { transition: none; }
+
+/* Dark-mode refinements for the new component classes. */
+html.dark .card, [data-theme="dark"] .card {
+  background-color: #111827;
+  border-color: #1f293d;
+}
+html.dark .btn-outline, [data-theme="dark"] .btn-outline {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+html.dark .btn-outline:hover, [data-theme="dark"] .btn-outline:hover {
+  background: #162032;
+  border-color: #475569;
+}
+
+/* Print: strip chrome, keep content readable (GIGW-friendly hard copies). */
+@media print {
+  header, footer, .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .card, .card-hover { box-shadow: none !important; border: 1px solid #999 !important; }
+  main { min-height: auto !important; }
+}
+
+/* ── Printable Progress Report sheet ────────────────────────────────────
+   Screen: a white A4-style card on the portal background.
+   Print:  fills the page, certificate borders stay, everything else goes. */
+.report-sheet {
+  box-shadow: 0 4px 16px -6px rgba(12, 42, 67, 0.25);
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 12mm 14mm;
+  }
+  body * { visibility: hidden; }
+  .report-sheet,
+  .report-sheet * { visibility: visible; }
+  .report-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    border-color: #0c2a43 !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .report-sheet table { page-break-inside: avoid; }
+  .report-sheet section { page-break-inside: avoid; }
+  .report-sheet a { text-decoration: none; color: inherit; }
+  html { font-size: 12.5px !important; }
+}
