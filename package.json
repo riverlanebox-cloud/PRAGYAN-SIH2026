@@ -1,0 +1,56 @@
+{
+  "name": "pragyan-learning-portal",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:integration": "tsx --test tests/*.integration.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:setup": "tsx scripts/migrate.ts && tsx scripts/seed.ts && tsx scripts/backfill-analytics.ts",
+    "db:check": "tsx scripts/check-db.ts",
+    "analytics:backfill": "tsx scripts/backfill-analytics.ts",
+    "content:import": "tsx scripts/import-content.ts",
+    "content:dry-run": "tsx scripts/import-content.ts --dry-run"
+  },
+  "dependencies": {
+    "@fontsource/mukta": "^5.3.0",
+    "@fontsource/noto-sans-kannada": "^5.3.0",
+    "@fontsource/noto-sans-malayalam": "^5.3.0",
+    "@fontsource/noto-sans-tamil": "^5.3.0",
+    "@fontsource/noto-sans-telugu": "^5.3.0",
+    "@fontsource/noto-serif-devanagari": "^5.3.0",
+    "@libsql/client": "^0.18.0",
+    "@types/katex": "^0.16.8",
+    "dotenv": "17.3.1",
+    "drizzle-orm": "0.45.2",
+    "katex": "^0.18.7",
+    "lucide-react": "^1.35.0",
+    "next": "16.3.4",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "server-only": "^0.0.1",
+    "tsx": "^4.23.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "22.19.15",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.4",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

@@ -1,0 +1,94 @@
+import { withDatabase } from "@/lib/database-route";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
+import { GUEST_EMAILS } from "@/lib/guest-accounts";
+import { hashPassword, redirectTo, redirectWithSession } from "@/lib/session";
+
+const GUESTS = {
+  student: {
+    handle: "guest_student",
+    name: "Guest Student",
+    email: "guest.student@vidyasetu.gov.in",
+    role: "student" as const,
+    className: 8 as number | null,
+    state: "All India",
+    school: "VidyaSetu Guest" as string | null,
+    subjectSpecialization: null as string | null,
+    institutionId: null as string | null,
+  },
+  faculty: {
+    handle: "guest_faculty",
+    name: "Guest Faculty",
+    email: "guest.faculty@vidyasetu.gov.in",
+    role: "faculty" as const,
+    className: null as number | null,
+    state: "All India",
+    school: null as string | null,
+    subjectSpecialization: "Science" as string | null,
+    institutionId: "SCH-DEMO" as string | null,
+  },
+};
+
+const GUEST_MAX_AGE = 60 * 60 * 24 * 2;
+
+async function handleGET(req: Request) {
+  const role =
+    new URL(req.url).searchParams.get("role") === "faculty" ? "faculty" : "student";
+  const g = GUESTS[role];
+
+  try {
+    let [user] = await db
+      .select({ id: users.id, role: users.role })
+      .from(users)
+      .where(and(inArray(users.email, GUEST_EMAILS[role]), eq(users.isGuest, true)))
+      .limit(1);
+
+    if (!user) {
+      const inserted = await db
+        .insert(users)
+        .values({
+          handle: g.handle,
+          name: g.name,
+          email: g.email,
+          passwordHash: hashPassword(`guest-${Math.random().toString(36).slice(2)}`),
+          role: g.role,
+          className: g.className,
+          state: g.state,
+          school: g.school,
+          subjectSpecialization: g.subjectSpecialization,
+          institutionId: g.institutionId,
+          // Demo guests sit on an institutional domain, so they count as verified.
+          emailVerified: true,
+          emailVerifiedAt: new Date(),
+          emailDomain: g.email.split("@")[1] ?? null,
+          verificationStatus: "verified",
+          verifiedBy: "Demo guest access",
+          isGuest: true,
+        })
+        .onConflictDoNothing()
+        .returning({ id: users.id, role: users.role });
+
+      user =
+        inserted[0] ??
+        (
+          await db
+            .select({ id: users.id, role: users.role })
+            .from(users)
+            .where(and(inArray(users.email, GUEST_EMAILS[role]), eq(users.isGuest, true)))
+            .limit(1)
+        )[0];
+    }
+
+    if (!user) return redirectTo("/home");
+    return redirectWithSession(req, "/home", user, GUEST_MAX_AGE);
+  } catch (err) {
+    console.error("[guest]", err);
+    return redirectTo("/home");
+  }
+}
+
+export const GET = withDatabase(handleGET);
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
